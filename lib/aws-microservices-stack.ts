@@ -11,8 +11,16 @@ export class AwsMicroservicesStack extends cdk.Stack {
         super(scope, id, props);
 
         const database = new Database(this, 'Database')
-        const microservices = new Microservice(this, "Microservice", {productTable: database.productTable})
-        const apiGateway = new ApiGateway(this, 'apigateway', {productMicroservice: microservices.productMicroservice})
+
+        const microservices = new Microservice(this, "Microservice", {
+            productTable: database.productTable,
+            basketTable: database.basketTable
+        })
+
+        const apiGateway = new ApiGateway(this, 'apigateway', {
+            productMicroservice: microservices.productMicroservice,
+            basketMicroservice: microservices.basketMicroservice
+        })
 
     }
 }

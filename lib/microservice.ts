@@ -5,7 +5,8 @@ import {join} from "path";
 import {ITable} from "aws-cdk-lib/aws-dynamodb";
 
 interface MicroserviceProps {
-    productTable: ITable
+    productTable: ITable,
+    basketTable: ITable,
 }
 
 export class Microservice extends Construct {
@@ -39,7 +40,7 @@ export class Microservice extends Construct {
             ...nodeJsFunctionProps,
         })
 
-        props.productTable.grantReadWriteData(this.productMicroservice)
+        props.productTable.grantReadWriteData(productMicroservice)
         return productMicroservice
     }
 
@@ -52,17 +53,17 @@ export class Microservice extends Construct {
             },
             environment: {
                 PRIMARY_KEY: 'id',
-                DYNAMODB_TABLE_NAME: props.productTable.tableName
+                DYNAMODB_TABLE_NAME: props.basketTable.tableName
             },
             runtime: Runtime.NODEJS_LATEST
         }
 
         const basketFunction = new NodejsFunction(this, 'basketLamdaFunction', {
-            entry: join(__dirname, `/../src/product/index.js`),
+            entry: join(__dirname, `/../src/basket/index.js`),
             ...nodeJsFunctionProps,
         })
 
-        props.productTable.grantReadWriteData(this.basketMicroservice)
+        props.basketTable.grantReadWriteData(basketFunction)
         return basketFunction
     }
 }
