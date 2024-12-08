@@ -6,7 +6,8 @@ import {IFunction} from "aws-cdk-lib/aws-lambda";
 
 interface ApiGatewayProps {
     productMicroservice: NodejsFunction,
-    basketMicroservice: NodejsFunction
+    basketMicroservice: NodejsFunction,
+    orderMicroservice: NodejsFunction
 }
 
 export class ApiGateway extends Construct {
@@ -14,6 +15,7 @@ export class ApiGateway extends Construct {
         super(scope, id);
         this.createProductApiGateway(props.productMicroservice)
         this.createBasketApiGateway(props.basketMicroservice)
+        this.createOrderApiGateway(props.orderMicroservice)
     }
 
     private createProductApiGateway(productMicroservice: IFunction) {
@@ -51,5 +53,19 @@ export class ApiGateway extends Construct {
         const basketCheckout = basket.addResource('checkout')
         basketCheckout.addMethod('POST')
 
+    }
+
+    private createOrderApiGateway(orderMicroservice: IFunction) {
+        const apigw = new LambdaRestApi(this, 'orderApi', {
+            restApiName: 'Order Service',
+            handler: orderMicroservice,
+            proxy: false
+        })
+
+        const orders = apigw.root.addResource('order')
+        orders.addMethod('GET')
+
+        const orderByUser = orders.addResource('{userName}')
+        orderByUser.addMethod('GET')
     }
 }

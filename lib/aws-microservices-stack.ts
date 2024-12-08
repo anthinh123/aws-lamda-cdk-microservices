@@ -3,8 +3,7 @@ import {Construct} from 'constructs';
 import {Database} from "./database";
 import {Microservice} from "./microservice";
 import {ApiGateway} from "./apigateway";
-
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+import {Eventbus} from "./eventbus";
 
 export class AwsMicroservicesStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -14,12 +13,20 @@ export class AwsMicroservicesStack extends cdk.Stack {
 
         const microservices = new Microservice(this, "Microservice", {
             productTable: database.productTable,
-            basketTable: database.basketTable
+            basketTable: database.basketTable,
+            orderTable: database.orderTable
         })
 
         const apiGateway = new ApiGateway(this, 'apigateway', {
             productMicroservice: microservices.productMicroservice,
-            basketMicroservice: microservices.basketMicroservice
+            basketMicroservice: microservices.basketMicroservice,
+            orderMicroservice: microservices.orderMicroservice,
+        })
+
+        // event bus
+        const eventBus = new Eventbus(this, 'EventBus', {
+            publisher: microservices.basketMicroservice,
+            target: microservices.orderMicroservice
         })
 
     }
