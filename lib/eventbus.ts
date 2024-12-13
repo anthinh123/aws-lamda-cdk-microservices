@@ -3,7 +3,6 @@ import {IFunction} from "aws-cdk-lib/aws-lambda";
 import {EventBus, Rule} from "aws-cdk-lib/aws-events";
 import {LambdaFunction} from "aws-cdk-lib/aws-events-targets";
 
-
 interface EventBusProp {
     publisher: IFunction,
     target: IFunction
